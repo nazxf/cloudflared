@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   Activity,
@@ -8,21 +8,15 @@ import {
   CheckCircle2,
   ChevronDown,
   Headphones,
-  Mail,
   MapPin,
-  Menu,
   Minus,
   Package,
   Plus,
   Search,
-  Send,
   LockKeyhole,
   Star,
-  UsersRound,
-  X,
   Zap,
 } from 'lucide-react'
-import cloudflaredLogo from '@/assets/cloudflared-logo.png'
 import infrastructureCloudGlobe from '@/assets/infrastructure-cloud-globe.png'
 import heroCloudServer from '@/assets/hero-cloud-server.png'
 import { navLinks } from '@/data/nav'
@@ -31,17 +25,17 @@ import { pricingPlans, cycleOptions, computeYearlyMonthly } from '@/data/pricing
 import { infrastructureBenefits } from '@/data/infrastructure'
 import { testimonials } from '@/data/testimonials'
 import { faqItems } from '@/data/faq'
-import { footerColumns } from '@/data/footer'
 import type { BillingCycle } from '@/data/types'
 import { formatRupiah } from '@/lib/format'
 import { softEase, floatEase, createFadeUp, createHeroFade, createFloatingMotion } from '@/lib/motion'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { useScrollPosition } from '@/hooks/useScrollPosition'
-import { useEscapeKey } from '@/hooks/useEscapeKey'
-import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { containerClass } from '@/components/ui/container.styles'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { IconBadge } from '@/components/ui/IconBadge'
+import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -86,197 +80,6 @@ function App() {
   )
 }
 
-function AnnouncementBar({ open, onClose }: { open: boolean; onClose: () => void }) {
-  return (
-    <AnimatePresence initial={false}>
-      {open && (
-        <motion.div
-          key="announcement"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.32, ease: softEase }}
-          className="fixed inset-x-0 top-0 z-[60] overflow-hidden bg-cloud-navy text-white"
-        >
-          <div className={`${containerClass} flex items-center justify-center gap-3 py-2.5 text-[12px] font-bold sm:text-[13px]`}>
-            <span className="hidden items-center gap-1.5 text-emerald-300 sm:inline-flex">
-              <span className="relative inline-flex h-2 w-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              <span className="text-[11px] font-black uppercase tracking-[0.1em]">Live</span>
-            </span>
-            <span className="hidden h-3 w-px bg-white/20 sm:inline-block" />
-            <span className="flex-1 truncate text-center sm:flex-none sm:text-left">
-              Promo Tahunan: <span className="font-black text-cloud-orange">Hemat 20%</span> + domain gratis 1 tahun.{' '}
-              <a href="#pricing" className="font-black underline-offset-4 hover:underline">
-                Lihat paket
-              </a>
-            </span>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Tutup pengumuman"
-              className="ml-2 inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
-}
-
-function Header({
-  menuOpen,
-  setMenuOpen,
-  activeSection,
-  scrolled,
-  announcementOpen,
-}: {
-  menuOpen: boolean
-  setMenuOpen: (open: boolean) => void
-  activeSection: string
-  scrolled: boolean
-  announcementOpen: boolean
-}) {
-  const menuRef = useRef<HTMLDivElement | null>(null)
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
-
-  useEscapeKey(() => setMenuOpen(false), menuOpen)
-  useOutsideClick([menuRef, triggerRef], () => setMenuOpen(false), menuOpen)
-
-  const headerTopClass = announcementOpen ? 'top-9 sm:top-10' : 'top-0'
-  const surfaceClass = scrolled
-    ? 'border-cloud-line/80 bg-white/85 shadow-[0_12px_36px_rgba(15,24,48,0.08)] backdrop-blur-md'
-    : 'border-transparent bg-transparent shadow-none backdrop-blur-0'
-
-  return (
-    <header
-      className={`fixed inset-x-0 ${headerTopClass} z-50 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${surfaceClass}`}
-    >
-      <div className={`${containerClass} ${scrolled ? 'py-2.5 lg:py-3' : 'py-3.5 lg:py-4'} transition-[padding] duration-300`}>
-        <nav className="flex items-center justify-between gap-4">
-          <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
-            <img
-              src={cloudflaredLogo}
-              alt="CloudFlared"
-              className={`h-auto transition-[width] duration-300 ${scrolled ? 'w-[140px] lg:w-[152px]' : 'w-[152px] lg:w-[168px]'}`}
-            />
-          </a>
-
-          <div className="hidden items-center gap-7 text-sm font-extrabold text-cloud-navy lg:flex xl:gap-9">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.id
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className={`relative py-2 transition hover:text-cloud-orange ${
-                    isActive ? 'text-cloud-orange' : ''
-                  }`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-active-indicator"
-                      className="absolute -bottom-0.5 left-1/2 h-0.5 w-7 -translate-x-1/2 rounded-full bg-cloud-orange"
-                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                    />
-                  )}
-                </a>
-              )
-            })}
-          </div>
-
-          <div className="hidden items-center gap-3 lg:flex xl:gap-4">
-            <a
-              href="#home"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-extrabold text-cloud-navy transition hover:text-cloud-orange"
-            >
-              <UsersRound size={17} />
-              Login
-            </a>
-            <a
-              href="#pricing"
-              className={`inline-flex items-center justify-center gap-2.5 rounded-lg bg-cloud-orange text-sm font-extrabold text-white shadow-cloud-orange transition hover:-translate-y-0.5 hover:bg-cloud-orange-2 ${
-                scrolled ? 'min-h-[42px] px-5' : 'min-h-[46px] px-6'
-              } transition-[min-height,padding] duration-300`}
-            >
-              Mulai Sekarang
-              <ArrowRight size={16} />
-            </a>
-          </div>
-
-          <button
-            ref={triggerRef}
-            type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-cloud-line bg-white text-cloud-navy shadow-[0_12px_28px_rgba(16,24,40,0.08)] lg:hidden"
-            aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </nav>
-
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              ref={menuRef}
-              key="mobile-menu"
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: softEase }}
-              className="mt-3 rounded-lg border border-cloud-line bg-white p-3 shadow-cloud-card lg:hidden"
-            >
-              <div className="grid gap-1.5">
-                {navLinks.map((link) => {
-                  const isActive = activeSection === link.id
-                  return (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      className={`rounded-md px-3 py-3 text-sm font-extrabold transition ${
-                        isActive
-                          ? 'bg-orange-50 text-cloud-orange'
-                          : 'text-cloud-navy hover:bg-orange-50 hover:text-cloud-orange'
-                      }`}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {link.label}
-                    </a>
-                  )
-                })}
-                <div className="mt-1 grid gap-2 border-t border-cloud-line pt-3">
-                  <a
-                    href="#home"
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-cloud-line px-3 py-3 text-sm font-extrabold text-cloud-navy hover:border-cloud-orange/45 hover:text-cloud-orange"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <UsersRound size={16} />
-                    Login
-                  </a>
-                  <a
-                    href="#pricing"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-cloud-orange px-5 text-sm font-extrabold text-white shadow-cloud-orange"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Mulai Sekarang
-                    <ArrowRight size={16} />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </header>
-  )
-}
 
 function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
   const shouldReduceMotion = useReducedMotion()
@@ -1056,83 +859,6 @@ function CtaSection({ fadeUp }: { fadeUp: (delay?: number) => object }) {
         </motion.div>
       </div>
     </section>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className="footer-grid pt-16 text-white lg:pt-20">
-      <div className={containerClass}>
-        <div className="grid gap-10 border-b border-white/10 pb-10 lg:grid-cols-[1.25fr_2fr_1.15fr]">
-          <div>
-            <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
-              <img src={cloudflaredLogo} alt="CloudFlared" className="h-auto w-[150px]" />
-            </a>
-            <p className="mt-5 max-w-[310px] text-sm font-medium leading-7 text-slate-300">
-              Layanan web hosting berkinerja tinggi dengan keamanan terbaik dan uptime 99.9% untuk
-              kesuksesan online Anda.
-            </p>
-          </div>
-
-          <div className="grid gap-8 sm:grid-cols-3">
-            {footerColumns.map((column) => (
-              <div key={column.title}>
-                <h3 className="text-sm font-black text-white">{column.title}</h3>
-                <ul className="mt-5 space-y-3">
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <a href="#home" className="text-sm font-medium text-slate-300 transition hover:text-white">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <h3 className="text-sm font-black text-white">Newsletter</h3>
-            <p className="mt-5 text-sm font-medium leading-7 text-slate-300">
-              Dapatkan info terbaru dan promo menarik dari kami.
-            </p>
-            <form className="mt-5 flex rounded-lg bg-white/10 p-1">
-              <label htmlFor="newsletter-email" className="sr-only">
-                Email Anda
-              </label>
-              <div className="flex flex-1 items-center gap-2 px-3 text-slate-300">
-                <Mail size={17} />
-                <input
-                  id="newsletter-email"
-                  type="email"
-                  placeholder="Email Anda"
-                  className="min-w-0 flex-1 bg-transparent py-3 text-sm font-semibold text-white placeholder:text-slate-400 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                aria-label="Subscribe newsletter"
-                className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-md bg-cloud-orange text-white transition hover:bg-cloud-orange-2"
-              >
-                <Send size={17} />
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4 py-6 text-sm font-medium text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; 2026 CloudFlared. All rights reserved.</p>
-          <div className="flex gap-8">
-            <a href="#home" className="transition hover:text-white">
-              Kebijakan Privasi
-            </a>
-            <a href="#home" className="transition hover:text-white">
-              Syarat &amp; Ketentuan
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
   )
 }
 

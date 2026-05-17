@@ -115,12 +115,6 @@ input:focus-visible {
   background-size: auto, 72px 72px, 72px 72px;
 }
 
-.footer-grid {
-  background:
-    linear-gradient(180deg, #111d2e 0%, #0a1422 100%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-}
-
 @media (max-width: 1023px) {
   .stat-divider:nth-child(2)::after {
     display: none;

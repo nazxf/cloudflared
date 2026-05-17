@@ -1,0 +1,5 @@
+.footer-grid {
+  background:
+    linear-gradient(180deg, #111d2e 0%, #0a1422 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
