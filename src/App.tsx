@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
@@ -278,6 +278,8 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('home')
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly')
+  const [announcementOpen, setAnnouncementOpen] = useState(true)
+  const [scrolled, setScrolled] = useState(false)
   const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
@@ -305,6 +307,17 @@ function App() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const fadeUp = (delay = 0) => ({
     initial: { opacity: 0, y: shouldReduceMotion ? 0 : 24 },
     whileInView: { opacity: 1, y: 0 },
@@ -326,14 +339,17 @@ function App() {
       }
 
   return (
-    <div className="min-h-screen overflow-hidden bg-white text-cloud-navy">
+    <div className="min-h-screen bg-white text-cloud-navy">
+      <AnnouncementBar open={announcementOpen} onClose={() => setAnnouncementOpen(false)} />
       <Header
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
         activeSection={activeSection}
+        scrolled={scrolled}
+        announcementOpen={announcementOpen}
       />
 
-      <main>
+      <main className={announcementOpen ? 'pt-9 sm:pt-10' : 'pt-0'}>
         <HeroSection heroFade={heroFade} />
         <PricingSection
           fadeUp={fadeUp}
@@ -352,37 +368,110 @@ function App() {
   )
 }
 
+function AnnouncementBar({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <AnimatePresence initial={false}>
+      {open && (
+        <motion.div
+          key="announcement"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.32, ease: softEase }}
+          className="fixed inset-x-0 top-0 z-[60] overflow-hidden bg-cloud-navy text-white"
+        >
+          <div className={`${containerClass} flex items-center justify-center gap-3 py-2.5 text-[12px] font-bold sm:text-[13px]`}>
+            <span className="hidden items-center gap-1.5 text-emerald-300 sm:inline-flex">
+              <span className="relative inline-flex h-2 w-2">
+                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-[11px] font-black uppercase tracking-[0.1em]">Live</span>
+            </span>
+            <span className="hidden h-3 w-px bg-white/20 sm:inline-block" />
+            <span className="flex-1 truncate text-center sm:flex-none sm:text-left">
+              Promo Tahunan: <span className="font-black text-cloud-orange">Hemat 20%</span> + domain gratis 1 tahun.{' '}
+              <a href="#pricing" className="font-black underline-offset-4 hover:underline">
+                Lihat paket
+              </a>
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Tutup pengumuman"
+              className="ml-2 inline-flex h-7 w-7 flex-none items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
 function Header({
   menuOpen,
   setMenuOpen,
   activeSection,
+  scrolled,
+  announcementOpen,
 }: {
   menuOpen: boolean
   setMenuOpen: (open: boolean) => void
   activeSection: string
+  scrolled: boolean
+  announcementOpen: boolean
 }) {
-  return (
-    <header className="absolute left-0 right-0 top-0 z-50">
-      <div className={`${containerClass} py-5`}>
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
-              <img src={cloudflaredLogo} alt="CloudFlared" className="h-auto w-[168px] lg:w-[188px]" />
-            </a>
-            <a
-              href="#faq"
-              className="hidden items-center gap-2 rounded-full border border-cloud-line bg-white/95 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] text-cloud-navy shadow-[0_8px_22px_rgba(15,24,48,0.06)] backdrop-blur transition hover:border-emerald-200 hover:text-cloud-orange xl:inline-flex"
-              aria-label="Status sistem semua operasional"
-            >
-              <span className="relative inline-flex h-2 w-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              Semua sistem operasional
-            </a>
-          </div>
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
 
-          <div className="hidden items-center gap-10 text-sm font-extrabold text-cloud-navy lg:flex">
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(target)
+      ) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKey)
+    document.addEventListener('mousedown', handleClick)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener('mousedown', handleClick)
+    }
+  }, [menuOpen, setMenuOpen])
+
+  const headerTopClass = announcementOpen ? 'top-9 sm:top-10' : 'top-0'
+  const surfaceClass = scrolled
+    ? 'border-cloud-line/80 bg-white/85 shadow-[0_12px_36px_rgba(15,24,48,0.08)] backdrop-blur-md'
+    : 'border-transparent bg-transparent shadow-none backdrop-blur-0'
+
+  return (
+    <header
+      className={`fixed inset-x-0 ${headerTopClass} z-50 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${surfaceClass}`}
+    >
+      <div className={`${containerClass} ${scrolled ? 'py-2.5 lg:py-3' : 'py-3.5 lg:py-4'} transition-[padding] duration-300`}>
+        <nav className="flex items-center justify-between gap-4">
+          <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
+            <img
+              src={cloudflaredLogo}
+              alt="CloudFlared"
+              className={`h-auto transition-[width] duration-300 ${scrolled ? 'w-[140px] lg:w-[152px]' : 'w-[152px] lg:w-[168px]'}`}
+            />
+          </a>
+
+          <div className="hidden items-center gap-7 text-sm font-extrabold text-cloud-navy lg:flex xl:gap-9">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id
               return (
@@ -390,86 +479,105 @@ function Header({
                   key={link.label}
                   href={link.href}
                   className={`relative py-2 transition hover:text-cloud-orange ${
-                    isActive
-                      ? 'text-cloud-orange after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-7 after:-translate-x-1/2 after:rounded-full after:bg-cloud-orange'
-                      : ''
+                    isActive ? 'text-cloud-orange' : ''
                   }`}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   {link.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-indicator"
+                      className="absolute -bottom-0.5 left-1/2 h-0.5 w-7 -translate-x-1/2 rounded-full bg-cloud-orange"
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
                 </a>
               )
             })}
           </div>
 
-          <div className="hidden items-center gap-5 lg:flex">
-            <a href="#home" className="inline-flex items-center gap-2 text-sm font-extrabold text-cloud-navy transition hover:text-cloud-orange">
-              <UsersRound size={18} />
+          <div className="hidden items-center gap-3 lg:flex xl:gap-4">
+            <a
+              href="#home"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-extrabold text-cloud-navy transition hover:text-cloud-orange"
+            >
+              <UsersRound size={17} />
               Login
             </a>
             <a
               href="#pricing"
-              className="inline-flex min-h-12 items-center justify-center gap-3 rounded-lg bg-cloud-orange px-7 text-sm font-extrabold text-white shadow-cloud-orange transition hover:-translate-y-0.5 hover:bg-cloud-orange-2"
+              className={`inline-flex items-center justify-center gap-2.5 rounded-lg bg-cloud-orange text-sm font-extrabold text-white shadow-cloud-orange transition hover:-translate-y-0.5 hover:bg-cloud-orange-2 ${
+                scrolled ? 'min-h-[42px] px-5' : 'min-h-[46px] px-6'
+              } transition-[min-height,padding] duration-300`}
             >
               Mulai Sekarang
-              <ArrowRight size={18} />
+              <ArrowRight size={16} />
             </a>
           </div>
 
           <button
+            ref={triggerRef}
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-cloud-line bg-white text-cloud-navy shadow-[0_12px_28px_rgba(16,24,40,0.08)] lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-cloud-line bg-white text-cloud-navy shadow-[0_12px_28px_rgba(16,24,40,0.08)] lg:hidden"
             aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </nav>
 
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 rounded-lg border border-cloud-line bg-white p-4 shadow-cloud-card lg:hidden"
-          >
-            <div className="grid gap-2">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.id
-                return (
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              ref={menuRef}
+              key="mobile-menu"
+              initial={{ opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: softEase }}
+              className="mt-3 rounded-lg border border-cloud-line bg-white p-3 shadow-cloud-card lg:hidden"
+            >
+              <div className="grid gap-1.5">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.id
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className={`rounded-md px-3 py-3 text-sm font-extrabold transition ${
+                        isActive
+                          ? 'bg-orange-50 text-cloud-orange'
+                          : 'text-cloud-navy hover:bg-orange-50 hover:text-cloud-orange'
+                      }`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {link.label}
+                    </a>
+                  )
+                })}
+                <div className="mt-1 grid gap-2 border-t border-cloud-line pt-3">
                   <a
-                    key={link.label}
-                    href={link.href}
-                    className={`rounded-md px-3 py-3 text-sm font-extrabold transition ${
-                      isActive
-                        ? 'bg-orange-50 text-cloud-orange'
-                        : 'text-cloud-navy hover:bg-orange-50 hover:text-cloud-orange'
-                    }`}
+                    href="#home"
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-cloud-line px-3 py-3 text-sm font-extrabold text-cloud-navy hover:border-cloud-orange/45 hover:text-cloud-orange"
                     onClick={() => setMenuOpen(false)}
                   >
-                    {link.label}
+                    <UsersRound size={16} />
+                    Login
                   </a>
-                )
-              })}
-              <a
-                href="#home"
-                className="mt-1 inline-flex items-center justify-center gap-2 rounded-md border border-cloud-line px-3 py-3 text-sm font-extrabold text-cloud-navy hover:border-cloud-orange/45 hover:text-cloud-orange"
-                onClick={() => setMenuOpen(false)}
-              >
-                <UsersRound size={16} />
-                Login
-              </a>
-              <a
-                href="#pricing"
-                className="mt-1 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-cloud-orange px-5 text-sm font-extrabold text-white shadow-cloud-orange"
-                onClick={() => setMenuOpen(false)}
-              >
-                Mulai Sekarang
-                <ArrowRight size={16} />
-              </a>
-            </div>
-          </motion.div>
-        )}
+                  <a
+                    href="#pricing"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-cloud-orange px-5 text-sm font-extrabold text-white shadow-cloud-orange"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Mulai Sekarang
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   )
@@ -481,7 +589,7 @@ function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-cloud-hero pb-16 pt-24 sm:pt-28 lg:pb-20 lg:pt-[112px]"
+      className="relative overflow-hidden bg-cloud-hero pb-16 pt-20 sm:pt-24 lg:pb-20 lg:pt-28"
     >
       <div className="hero-grid absolute inset-0" aria-hidden="true" />
       <div className={`${containerClass} relative z-10`}>
