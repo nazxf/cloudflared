@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
+  Activity,
   ArrowRight,
   BadgeCheck,
   Check,
   CheckCircle2,
+  ChevronDown,
   CircleGauge,
   Clock3,
   Cloud,
@@ -13,9 +15,13 @@ import {
   Headphones,
   LockKeyhole,
   Mail,
+  MapPin,
   Menu,
+  Minus,
   Package,
+  Plus,
   Rocket,
+  Search,
   Send,
   Server,
   ShieldCheck,
@@ -65,7 +71,7 @@ const navLinks: NavLink[] = [
   { label: 'Fitur', href: '#features', id: 'features' },
   { label: 'Harga', href: '#pricing', id: 'pricing' },
   { label: 'Testimoni', href: '#testimonials', id: 'testimonials' },
-  { label: 'Bantuan', href: '#support', id: 'support' },
+  { label: 'FAQ', href: '#faq', id: 'faq' },
 ]
 
 const trustBadges: IconText[] = [
@@ -109,12 +115,25 @@ const heroStats: IconText[] = [
   },
 ]
 
+type FeatureMetric = {
+  label: string
+  value: string
+}
+
+const heroFeature = {
+  icon: CircleGauge,
+  eyebrow: 'Stack Performa',
+  title: 'NVMe SSD + LiteSpeed Web Server',
+  description:
+    'Storage NVMe membaca data hingga 6x lebih cepat dari SSD biasa. LiteSpeed melayani request PHP & static asset jauh lebih efisien dari Apache. Hasil: Time to First Byte rendah, halaman terbuka di bawah 1.5 detik.',
+  metrics: [
+    { label: 'Average TTFB', value: '180ms' },
+    { label: 'Page load', value: '1.2s' },
+    { label: 'Concurrent req', value: '10K+' },
+  ] as FeatureMetric[],
+}
+
 const features: IconText[] = [
-  {
-    icon: CircleGauge,
-    title: 'Performa Tinggi',
-    description: 'Server NVMe SSD dan LiteSpeed menjaga website tetap cepat saat traffic naik.',
-  },
   {
     icon: ShieldCheck,
     title: 'Keamanan Berlapis',
@@ -216,6 +235,41 @@ const footerColumns: FooterColumn[] = [
   },
 ]
 
+type FaqItem = { question: string; answer: string }
+
+const faqItems: FaqItem[] = [
+  {
+    question: 'Berapa lama proses migrasi dari hosting lama?',
+    answer:
+      'Tim kami memindahkan website Anda gratis dalam 24 jam, termasuk database, email, dan konfigurasi DNS. Tidak ada downtime selama proses migrasi karena kami sinkronkan dulu sebelum cutover.',
+  },
+  {
+    question: 'Apakah ada garansi uang kembali?',
+    answer:
+      '30 hari tanpa pertanyaan. Jika layanan tidak sesuai harapan, kami refund 100% lewat transfer bank atau e-wallet dalam 3 hari kerja.',
+  },
+  {
+    question: 'Domain gratis berlaku untuk berapa lama?',
+    answer:
+      'Domain .com, .net, atau .id gratis 1 tahun untuk paket Business dan Pro tahunan. Untuk perpanjangan tahun ke-2, Anda hanya bayar harga registrasi normal.',
+  },
+  {
+    question: 'Server CloudFlared di mana saja?',
+    answer:
+      'Data center utama di Jakarta dan Surabaya untuk traffic Indonesia, plus node di Singapore, Tokyo, dan Frankfurt untuk traffic global. Kami pilih lokasi terdekat secara otomatis berdasarkan visitor.',
+  },
+  {
+    question: 'Tim support pakai bahasa apa?',
+    answer:
+      'Bahasa Indonesia 24/7 lewat live chat, tiket, atau WhatsApp. Tim teknis kami semua di Indonesia, jadi tidak ada zona waktu yang menyulitkan.',
+  },
+  {
+    question: 'Bisa upgrade paket kapan saja?',
+    answer:
+      'Bisa, sewaktu-waktu lewat panel. Selisih harga dihitung pro-rata dari sisa masa aktif paket lama. Tidak ada biaya tambahan dan tidak perlu migrasi ulang.',
+  },
+]
+
 const containerClass = 'mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10'
 const softEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 const floatEase: [number, number, number, number] = [0.45, 0, 0.55, 1]
@@ -289,6 +343,7 @@ function App() {
         <FeatureSection fadeUp={fadeUp} />
         <InfrastructureSection fadeUp={fadeUp} floatingMotion={floatingMotion} />
         <TestimonialsSection fadeUp={fadeUp} />
+        <FaqSection fadeUp={fadeUp} />
         <CtaSection fadeUp={fadeUp} />
       </main>
 
@@ -310,9 +365,22 @@ function Header({
     <header className="absolute left-0 right-0 top-0 z-50">
       <div className={`${containerClass} py-5`}>
         <nav className="flex items-center justify-between">
-          <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
-            <img src={cloudflaredLogo} alt="CloudFlared" className="h-auto w-[168px] lg:w-[188px]" />
-          </a>
+          <div className="flex items-center gap-4">
+            <a href="#home" className="flex items-center" aria-label="CloudFlared Home">
+              <img src={cloudflaredLogo} alt="CloudFlared" className="h-auto w-[168px] lg:w-[188px]" />
+            </a>
+            <a
+              href="#faq"
+              className="hidden items-center gap-2 rounded-full border border-cloud-line bg-white/95 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] text-cloud-navy shadow-[0_8px_22px_rgba(15,24,48,0.06)] backdrop-blur transition hover:border-emerald-200 hover:text-cloud-orange xl:inline-flex"
+              aria-label="Status sistem semua operasional"
+            >
+              <span className="relative inline-flex h-2 w-2">
+                <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              Semua sistem operasional
+            </a>
+          </div>
 
           <div className="hidden items-center gap-10 text-sm font-extrabold text-cloud-navy lg:flex">
             {navLinks.map((link) => {
@@ -408,6 +476,8 @@ function Header({
 }
 
 function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section
       id="home"
@@ -435,7 +505,9 @@ function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
               dan uptime 99.9%.
             </p>
 
-            <div className="mt-7 flex flex-col gap-4 sm:flex-row">
+            <DomainFinder />
+
+            <div className="mt-6 flex flex-col gap-4 sm:flex-row">
               <a
                 href="#pricing"
                 className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-lg bg-cloud-orange px-7 text-[15px] font-extrabold text-white shadow-cloud-orange transition hover:-translate-y-0.5 hover:bg-cloud-orange-2"
@@ -480,6 +552,7 @@ function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
               alt="Ilustrasi server cloud aman CloudFlared"
               className="relative z-10 mx-auto block h-auto w-full max-w-[640px] select-none drop-shadow-[0_40px_70px_rgba(255,106,0,0.16)] lg:max-w-[720px] xl:max-w-[780px]"
             />
+            <HeroFloatingChips reduceMotion={!!shouldReduceMotion} />
           </motion.div>
         </div>
 
@@ -503,6 +576,159 @@ function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
         </motion.div>
       </div>
     </section>
+  )
+}
+
+function DomainFinder() {
+  const tlds = ['.com', '.id', '.co.id', '.net', '.org']
+  const [domain, setDomain] = useState('')
+  const [tld, setTld] = useState(tlds[0])
+  const [tldOpen, setTldOpen] = useState(false)
+
+  return (
+    <form
+      className="mt-7 max-w-[560px]"
+      onSubmit={(e) => {
+        e.preventDefault()
+      }}
+      role="search"
+      aria-label="Cari domain"
+    >
+      <div className="flex items-stretch overflow-hidden rounded-lg border border-cloud-line bg-white shadow-[0_18px_44px_rgba(16,24,40,0.08)] focus-within:border-cloud-orange/60 focus-within:ring-2 focus-within:ring-cloud-orange/15">
+        <div className="flex flex-1 items-center gap-2 px-4">
+          <Search size={17} className="flex-none text-slate-400" />
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
+            placeholder="cari-domain-idaman"
+            className="min-w-0 flex-1 bg-transparent py-3.5 text-sm font-bold text-cloud-navy placeholder:font-semibold placeholder:text-slate-400 focus:outline-none"
+            aria-label="Nama domain"
+          />
+        </div>
+
+        <div className="relative flex items-center border-l border-cloud-line">
+          <button
+            type="button"
+            onClick={() => setTldOpen((prev) => !prev)}
+            aria-expanded={tldOpen}
+            aria-haspopup="listbox"
+            className="inline-flex h-full items-center gap-1.5 px-3 text-sm font-black text-cloud-navy hover:text-cloud-orange"
+          >
+            {tld}
+            <ChevronDown size={14} className={`transition ${tldOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {tldOpen && (
+            <ul
+              role="listbox"
+              className="absolute right-0 top-full z-30 mt-2 min-w-[120px] overflow-hidden rounded-md border border-cloud-line bg-white py-1 shadow-cloud-card"
+            >
+              {tlds.map((option) => (
+                <li key={option} role="option" aria-selected={tld === option}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTld(option)
+                      setTldOpen(false)
+                    }}
+                    className={`flex w-full items-center justify-between px-4 py-2 text-sm font-extrabold transition ${
+                      tld === option
+                        ? 'bg-orange-50 text-cloud-orange'
+                        : 'text-cloud-navy hover:bg-orange-50 hover:text-cloud-orange'
+                    }`}
+                  >
+                    {option}
+                    {tld === option && <Check size={13} strokeWidth={3} />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          className="inline-flex items-center justify-center gap-2 bg-cloud-orange px-5 text-sm font-black text-white transition hover:bg-cloud-orange-2 sm:px-6"
+          aria-label="Cari domain"
+        >
+          <Search size={16} className="sm:hidden" />
+          <span className="hidden sm:inline">Cek Domain</span>
+        </button>
+      </div>
+      <p className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-slate-500">
+        <span className="inline-flex items-center gap-1.5">
+          <CheckCircle2 size={13} className="text-cloud-orange" />
+          Gratis 1 tahun untuk paket Business
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <CheckCircle2 size={13} className="text-cloud-orange" />
+          Mulai Rp 99.000/tahun
+        </span>
+      </p>
+    </form>
+  )
+}
+
+function HeroFloatingChips({ reduceMotion }: { reduceMotion: boolean }) {
+  const float = (delay: number) =>
+    reduceMotion
+      ? {}
+      : {
+          animate: { y: [0, -8, 0] },
+          transition: { duration: 6, delay, repeat: Infinity, ease: floatEase },
+        }
+
+  return (
+    <>
+      <motion.div
+        {...float(0)}
+        className="pointer-events-none absolute left-2 top-12 z-20 hidden items-center gap-2.5 rounded-full border border-cloud-line bg-white/95 px-3.5 py-2 shadow-[0_18px_36px_rgba(15,24,48,0.12)] backdrop-blur sm:flex lg:left-[-12px] lg:top-16"
+      >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+          <LockKeyhole size={15} strokeWidth={2.6} />
+        </span>
+        <div className="text-left">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">SSL</div>
+          <div className="text-sm font-black text-cloud-navy">Active &amp; Encrypted</div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        {...float(1.2)}
+        className="pointer-events-none absolute right-0 top-4 z-20 hidden items-center gap-3 rounded-md border border-cloud-line bg-white/95 px-4 py-2.5 shadow-[0_18px_36px_rgba(15,24,48,0.12)] backdrop-blur md:flex lg:right-[-8px] lg:top-8"
+      >
+        <div className="text-left">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+            <Activity size={12} className="text-cloud-orange" />
+            Uptime 30d
+          </div>
+          <div className="mt-0.5 text-sm font-black tabular-nums text-cloud-navy">99.97%</div>
+        </div>
+        <svg viewBox="0 0 56 22" className="h-5 w-14" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            d="M0 16 L8 14 L16 18 L24 8 L32 12 L40 5 L48 9 L56 3"
+            fill="none"
+            stroke="#ff5f00"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </motion.div>
+
+      <motion.div
+        {...float(2.1)}
+        className="pointer-events-none absolute bottom-6 left-4 z-20 hidden items-center gap-2.5 rounded-full border border-cloud-line bg-white/95 px-3.5 py-2 shadow-[0_18px_36px_rgba(15,24,48,0.12)] backdrop-blur md:flex lg:bottom-10 lg:left-2"
+      >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-cloud-orange">
+          <MapPin size={15} strokeWidth={2.6} />
+        </span>
+        <div className="text-left">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Routed via</div>
+          <div className="text-sm font-black text-cloud-navy">Jakarta · 14ms</div>
+        </div>
+      </motion.div>
+    </>
   )
 }
 
@@ -645,37 +871,149 @@ function PricingSection({
 }
 
 function FeatureSection({ fadeUp }: { fadeUp: (delay?: number) => object }) {
+  const HeroIcon = heroFeature.icon
+
   return (
     <section id="features" className="bg-white py-20 lg:py-24">
       <div className={containerClass}>
-        <motion.div {...fadeUp(0.02)} className="mx-auto max-w-[720px] text-center">
+        <motion.div {...fadeUp(0.02)} className="max-w-[760px]">
           <SectionLabel icon={Zap}>Fitur Unggulan</SectionLabel>
-          <h2 className="mt-5 text-[32px] font-black leading-[1.15] tracking-hero text-cloud-navy sm:text-[44px]">
+          <h2 className="mt-5 text-[32px] font-black leading-[1.12] tracking-hero text-cloud-navy sm:text-[44px]">
             Semua yang Dibutuhkan untuk Website yang Cepat dan Aman
           </h2>
         </motion.div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => {
-            const Icon = feature.icon
-
-            return (
-              <motion.article
-                key={feature.title}
-                {...fadeUp(index * 0.07)}
-                className="group rounded-lg border border-cloud-line bg-white p-6 shadow-[0_18px_45px_rgba(16,24,40,0.06)] transition duration-300 hover:-translate-y-1 hover:border-cloud-orange/40 hover:shadow-[0_24px_55px_rgba(255,95,0,0.14)]"
-              >
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-orange-50 text-cloud-orange transition group-hover:bg-cloud-orange group-hover:text-white">
-                  <Icon size={27} strokeWidth={2.4} />
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1.45fr_1fr]">
+          <motion.article
+            {...fadeUp(0.06)}
+            className="group relative overflow-hidden rounded-lg border border-cloud-line bg-white p-7 shadow-cloud-card lg:p-9"
+          >
+            <div className="grid gap-7 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-9">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-black uppercase tracking-[0.1em] text-cloud-orange">
+                  <HeroIcon size={13} strokeWidth={2.6} />
+                  {heroFeature.eyebrow}
+                </span>
+                <h3 className="mt-5 text-2xl font-black leading-[1.18] text-cloud-navy lg:text-[28px]">
+                  {heroFeature.title}
+                </h3>
+                <p className="mt-4 text-sm font-medium leading-7 text-slate-600 lg:text-[15px]">
+                  {heroFeature.description}
+                </p>
+                <div className="mt-7 grid grid-cols-3 gap-4 border-t border-cloud-line pt-6">
+                  {heroFeature.metrics.map((metric) => (
+                    <div key={metric.label}>
+                      <div className="text-xl font-black text-cloud-orange tabular-nums lg:text-2xl">
+                        {metric.value}
+                      </div>
+                      <div className="mt-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                        {metric.label}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <h3 className="mt-5 text-lg font-black text-cloud-navy">{feature.title}</h3>
-                <p className="mt-3 text-sm font-medium leading-7 text-slate-600">{feature.description}</p>
-              </motion.article>
-            )
-          })}
+              </div>
+
+              <SpeedMeterVisual />
+            </div>
+          </motion.article>
+
+          <div className="grid gap-6">
+            {features.map((feature, index) => {
+              const Icon = feature.icon
+
+              return (
+                <motion.article
+                  key={feature.title}
+                  {...fadeUp(0.1 + index * 0.06)}
+                  className="group flex gap-5 rounded-lg border border-cloud-line bg-white p-6 shadow-[0_18px_45px_rgba(16,24,40,0.06)] transition duration-300 hover:-translate-y-1 hover:border-cloud-orange/40 hover:shadow-[0_24px_55px_rgba(255,95,0,0.14)]"
+                >
+                  <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-lg bg-orange-50 text-cloud-orange transition group-hover:bg-cloud-orange group-hover:text-white">
+                    <Icon size={22} strokeWidth={2.4} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-cloud-navy">{feature.title}</h3>
+                    <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{feature.description}</p>
+                  </div>
+                </motion.article>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function SpeedMeterVisual() {
+  return (
+    <div className="relative aspect-[5/4] w-full overflow-hidden rounded-md border border-cloud-line bg-[linear-gradient(155deg,#fff8f0_0%,#ffffff_60%)] p-6">
+      <div className="flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-slate-500">
+          <span className="relative inline-flex h-2 w-2">
+            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Live Benchmark
+        </span>
+        <span className="text-[11px] font-bold text-slate-400">jakarta-01</span>
+      </div>
+
+      <div className="mt-6 flex items-end justify-between">
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Page Load</div>
+          <div className="mt-1 flex items-baseline gap-1 font-black text-cloud-navy">
+            <span className="text-4xl tabular-nums">1.2</span>
+            <span className="text-base text-cloud-orange">s</span>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Score</div>
+          <div className="mt-1 text-2xl font-black tabular-nums text-cloud-navy">98</div>
+        </div>
+      </div>
+
+      <svg
+        viewBox="0 0 220 70"
+        className="mt-5 h-16 w-full"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="speedGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#ff5f00" stopOpacity="0.32" />
+            <stop offset="100%" stopColor="#ff5f00" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 50 L25 46 L50 48 L75 30 L100 34 L125 18 L150 22 L175 12 L200 16 L220 8"
+          fill="none"
+          stroke="#ff5f00"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M0 50 L25 46 L50 48 L75 30 L100 34 L125 18 L150 22 L175 12 L200 16 L220 8 L220 70 L0 70 Z"
+          fill="url(#speedGrad)"
+        />
+      </svg>
+
+      <div className="mt-4 grid grid-cols-3 gap-3 text-[11px] font-bold">
+        <div className="rounded-md bg-white px-3 py-2 text-center shadow-[0_6px_18px_rgba(15,24,48,0.05)]">
+          <div className="font-black text-cloud-navy">NVMe</div>
+          <div className="mt-0.5 text-slate-500">SSD</div>
+        </div>
+        <div className="rounded-md bg-white px-3 py-2 text-center shadow-[0_6px_18px_rgba(15,24,48,0.05)]">
+          <div className="font-black text-cloud-navy">LiteSpeed</div>
+          <div className="mt-0.5 text-slate-500">v6</div>
+        </div>
+        <div className="rounded-md bg-white px-3 py-2 text-center shadow-[0_6px_18px_rgba(15,24,48,0.05)]">
+          <div className="font-black text-cloud-navy">HTTP/3</div>
+          <div className="mt-0.5 text-slate-500">QUIC</div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -774,11 +1112,92 @@ function TestimonialsSection({ fadeUp }: { fadeUp: (delay?: number) => object })
   )
 }
 
+function FaqSection({ fadeUp }: { fadeUp: (delay?: number) => object }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
+
+  return (
+    <section id="faq" className="bg-[linear-gradient(180deg,#ffffff_0%,#fff8f0_100%)] py-20 lg:py-24">
+      <div className={containerClass}>
+        <div className="grid items-start gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          <motion.div {...fadeUp(0.02)}>
+            <SectionLabel icon={Headphones}>Pertanyaan Umum</SectionLabel>
+            <h2 className="mt-5 text-[32px] font-black leading-[1.14] tracking-hero text-cloud-navy sm:text-[42px]">
+              Hal yang Sering Ditanyakan Sebelum Mulai
+            </h2>
+            <p className="mt-5 max-w-[440px] text-base font-medium leading-7 text-slate-600">
+              Tidak ketemu jawabannya? Tim kami online 24/7 lewat live chat dan WhatsApp untuk
+              bantu langsung.
+            </p>
+            <a
+              href="#support"
+              className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-lg border border-cloud-line bg-white px-5 text-sm font-extrabold text-cloud-navy shadow-[0_12px_28px_rgba(16,24,40,0.06)] transition hover:border-cloud-orange/45 hover:text-cloud-orange"
+            >
+              Hubungi Support
+              <ArrowRight size={16} />
+            </a>
+          </motion.div>
+
+          <motion.div {...fadeUp(0.08)} className="grid gap-3">
+            {faqItems.map((item, index) => {
+              const isOpen = openIndex === index
+
+              return (
+                <div
+                  key={item.question}
+                  className={`overflow-hidden rounded-lg border bg-white transition ${
+                    isOpen
+                      ? 'border-cloud-orange/40 shadow-[0_18px_44px_rgba(255,95,0,0.1)]'
+                      : 'border-cloud-line shadow-[0_8px_22px_rgba(15,24,48,0.04)] hover:border-cloud-orange/30'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-panel-${index}`}
+                    className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left lg:px-6 lg:py-5"
+                  >
+                    <span className="text-[15px] font-black text-cloud-navy lg:text-base">
+                      {item.question}
+                    </span>
+                    <span
+                      className={`inline-flex h-9 w-9 flex-none items-center justify-center rounded-full transition ${
+                        isOpen
+                          ? 'bg-cloud-orange text-white'
+                          : 'bg-orange-50 text-cloud-orange'
+                      }`}
+                    >
+                      {isOpen ? <Minus size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={3} />}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-panel-${index}`}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      transition={{ duration: 0.28, ease: softEase }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-5 text-sm font-medium leading-7 text-slate-600 lg:px-6 lg:pb-6">
+                        {item.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </div>
+              )
+            })}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function CtaSection({ fadeUp }: { fadeUp: (delay?: number) => object }) {
   return (
     <section
       id="support"
-      className="relative bg-[linear-gradient(180deg,#ffffff_0%,#ffffff_55%,#0a1422_55%,#0a1422_100%)] pt-20 lg:pt-24"
+      className="relative bg-[linear-gradient(180deg,#fff8f0_0%,#fff8f0_55%,#0a1422_55%,#0a1422_100%)] pt-20 lg:pt-24"
     >
       <div className={containerClass}>
         <motion.div
