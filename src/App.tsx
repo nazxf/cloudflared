@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   Activity,
@@ -35,53 +35,22 @@ import { footerColumns } from '@/data/footer'
 import type { BillingCycle } from '@/data/types'
 import { formatRupiah } from '@/lib/format'
 import { softEase, floatEase, createFadeUp, createHeroFade, createFloatingMotion } from '@/lib/motion'
-import type { LucideIcon } from 'lucide-react'
-
-const containerClass = 'mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { useScrollPosition } from '@/hooks/useScrollPosition'
+import { useEscapeKey } from '@/hooks/useEscapeKey'
+import { useOutsideClick } from '@/hooks/useOutsideClick'
+import { containerClass } from '@/components/ui/container.styles'
+import { SectionLabel } from '@/components/ui/SectionLabel'
+import { IconBadge } from '@/components/ui/IconBadge'
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<string>('home')
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly')
   const [announcementOpen, setAnnouncementOpen] = useState(true)
-  const [scrolled, setScrolled] = useState(false)
   const shouldReduceMotion = useReducedMotion()
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const sections = navLinks
-      .map((link) => document.getElementById(link.id))
-      .filter((el): el is HTMLElement => el !== null)
-
-    if (sections.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-        if (visible?.target.id) {
-          setActiveSection(visible.target.id)
-        }
-      },
-      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
-    )
-
-    sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 24)
-    }
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const activeSection = useScrollSpy(navLinks.map((link) => link.id), { initial: 'home' })
+  const scrolled = useScrollPosition(24)
 
   const fadeUp = createFadeUp(!!shouldReduceMotion)
   const heroFade = createHeroFade(!!shouldReduceMotion)
@@ -175,31 +144,8 @@ function Header({
   const menuRef = useRef<HTMLDivElement | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
 
-  useEffect(() => {
-    if (!menuOpen) return
-
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as Node
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(target) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(target)
-      ) {
-        setMenuOpen(false)
-      }
-    }
-
-    document.addEventListener('keydown', handleKey)
-    document.addEventListener('mousedown', handleClick)
-    return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.removeEventListener('mousedown', handleClick)
-    }
-  }, [menuOpen, setMenuOpen])
+  useEscapeKey(() => setMenuOpen(false), menuOpen)
+  useOutsideClick([menuRef, triggerRef], () => setMenuOpen(false), menuOpen)
 
   const headerTopClass = announcementOpen ? 'top-9 sm:top-10' : 'top-0'
   const surfaceClass = scrolled
@@ -382,21 +328,15 @@ function HeroSection({ heroFade }: { heroFade: (delay?: number) => object }) {
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {trustBadges.map((badge) => {
-                const Icon = badge.icon
-
-                return (
-                  <div key={badge.title} className="flex items-center gap-3">
-                    <span className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-full bg-white text-cloud-orange shadow-[0_12px_28px_rgba(16,24,40,0.08)] ring-1 ring-orange-100">
-                      <Icon size={19} strokeWidth={2.4} />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-extrabold text-cloud-navy">{badge.title}</span>
-                      <span className="mt-0.5 block text-xs font-semibold text-slate-500">{badge.description}</span>
-                    </span>
-                  </div>
-                )
-              })}
+              {trustBadges.map((badge) => (
+                <div key={badge.title} className="flex items-center gap-3">
+                  <IconBadge icon={badge.icon} variant="chip" size="md" />
+                  <span>
+                    <span className="block text-sm font-extrabold text-cloud-navy">{badge.title}</span>
+                    <span className="mt-0.5 block text-xs font-semibold text-slate-500">{badge.description}</span>
+                  </span>
+                </div>
+              ))}
             </div>
           </motion.div>
 
@@ -932,21 +872,15 @@ function InfrastructureSection({
           </p>
 
           <div className="mt-9 grid gap-5">
-            {infrastructureBenefits.map((benefit) => {
-              const Icon = benefit.icon
-
-              return (
-                <div key={benefit.title} className="flex gap-4">
-                  <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full bg-white text-cloud-orange shadow-[0_12px_28px_rgba(255,106,0,0.12)]">
-                    <Icon size={23} strokeWidth={2.4} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black text-cloud-navy">{benefit.title}</h3>
-                    <p className="mt-1 text-sm font-medium leading-6 text-slate-600">{benefit.description}</p>
-                  </div>
+            {infrastructureBenefits.map((benefit) => (
+              <div key={benefit.title} className="flex gap-4">
+                <IconBadge icon={benefit.icon} variant="soft" size="md" iconSize={23} className="rounded-full" />
+                <div>
+                  <h3 className="text-lg font-black text-cloud-navy">{benefit.title}</h3>
+                  <p className="mt-1 text-sm font-medium leading-6 text-slate-600">{benefit.description}</p>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </motion.div>
 
@@ -1199,15 +1133,6 @@ function Footer() {
         </div>
       </div>
     </footer>
-  )
-}
-
-function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: string }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50 px-4 py-2 text-sm font-black text-cloud-orange">
-      <Icon size={15} />
-      {children}
-    </span>
   )
 }
 
