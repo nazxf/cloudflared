@@ -853,6 +853,8 @@ function PricingSection({
     { id: 'monthly', label: 'Bulanan' },
     { id: 'yearly', label: 'Tahunan', hint: 'Hemat 20%' },
   ]
+  const shouldReduceMotion = useReducedMotion()
+  const flipDistance = shouldReduceMotion ? 0 : 22
 
   return (
     <section
@@ -873,7 +875,7 @@ function PricingSection({
           <div
             role="tablist"
             aria-label="Siklus pembayaran"
-            className="inline-flex flex-wrap gap-1.5 self-start rounded-lg border border-cloud-line bg-white p-1.5 shadow-[0_12px_28px_rgba(16,24,40,0.06)] lg:justify-self-end"
+            className="relative inline-flex gap-1 self-start rounded-lg border border-cloud-line bg-white p-1.5 shadow-[0_12px_28px_rgba(16,24,40,0.06)] lg:justify-self-end"
           >
             {cycleOptions.map((option) => {
               const isActive = billingCycle === option.id
@@ -884,16 +886,31 @@ function PricingSection({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setBillingCycle(option.id)}
-                  className={`inline-flex min-h-10 items-center gap-2 rounded-md px-4 text-sm font-extrabold transition ${
-                    isActive
-                      ? 'bg-cloud-orange text-white shadow-[0_10px_24px_rgba(255,106,0,0.22)]'
-                      : 'text-cloud-navy hover:text-cloud-orange'
-                  }`}
+                  className="relative inline-flex min-h-10 items-center gap-2 rounded-md px-4 text-sm font-extrabold transition-colors duration-200 focus-visible:outline-none"
                 >
-                  {option.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="billing-cycle-pill"
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-md bg-cloud-orange shadow-[0_10px_24px_rgba(255,106,0,0.28)]"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 420,
+                        damping: 34,
+                        mass: 0.7,
+                      }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 transition-colors duration-200 ${
+                      isActive ? 'text-white' : 'text-cloud-navy group-hover:text-cloud-orange'
+                    }`}
+                  >
+                    {option.label}
+                  </span>
                   {option.hint && (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+                      className={`relative z-10 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide transition-colors duration-200 ${
                         isActive ? 'bg-white/25 text-white' : 'bg-orange-50 text-cloud-orange'
                       }`}
                     >
@@ -939,12 +956,36 @@ function PricingSection({
                   </p>
                   <div className="mt-7 flex items-end gap-1">
                     <span className="text-xs font-extrabold text-cloud-navy">Rp</span>
-                    <span className="text-3xl font-black text-cloud-orange tabular-nums">
-                      {formatRupiah(displayPrice)}
-                    </span>
+                    <div className="relative h-9 overflow-hidden">
+                      <AnimatePresence initial={false}>
+                        <motion.span
+                          key={billingCycle}
+                          initial={{ y: flipDistance, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -flipDistance, opacity: 0 }}
+                          transition={{ duration: shouldReduceMotion ? 0 : 0.32, ease: softEase }}
+                          className="absolute inset-0 block whitespace-nowrap text-3xl font-black leading-none text-cloud-orange tabular-nums"
+                        >
+                          {formatRupiah(displayPrice)}
+                        </motion.span>
+                      </AnimatePresence>
+                    </div>
                     <span className="pb-1 text-sm font-bold text-slate-500">/bulan</span>
                   </div>
-                  <p className="mt-2 text-xs font-semibold text-slate-500">{billedNote}</p>
+                  <div className="mt-2 h-4 overflow-hidden">
+                    <AnimatePresence initial={false} mode="wait">
+                      <motion.p
+                        key={billedNote}
+                        initial={{ y: shouldReduceMotion ? 0 : 8, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: shouldReduceMotion ? 0 : -8, opacity: 0 }}
+                        transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: softEase }}
+                        className="text-xs font-semibold text-slate-500"
+                      >
+                        {billedNote}
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
                 </div>
 
                 <ul className="mt-7 space-y-4">
