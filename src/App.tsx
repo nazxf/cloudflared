@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
   ArrowRight,
@@ -8,276 +7,42 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  CircleGauge,
-  Clock3,
-  Cloud,
-  Globe2,
   Headphones,
-  LockKeyhole,
   Mail,
   MapPin,
   Menu,
   Minus,
   Package,
   Plus,
-  Rocket,
   Search,
   Send,
-  Server,
-  ShieldCheck,
+  LockKeyhole,
   Star,
   UsersRound,
   X,
   Zap,
 } from 'lucide-react'
-import cloudflaredLogo from './assets/cloudflared-logo.png'
-import infrastructureCloudGlobe from './assets/infrastructure-cloud-globe.png'
-import heroCloudServer from './assets/hero-cloud-server.png'
-
-type NavLink = {
-  label: string
-  href: string
-  id: string
-}
-
-type IconText = {
-  icon: LucideIcon
-  title: string
-  description: string
-}
-
-type PricingPlan = {
-  name: string
-  description: string
-  monthlyPrice: number
-  features: string[]
-  featured?: boolean
-}
-
-type Testimonial = {
-  quote: string
-  name: string
-  role: string
-  initials: string
-}
-
-type FooterColumn = {
-  title: string
-  links: string[]
-}
-
-const navLinks: NavLink[] = [
-  { label: 'Beranda', href: '#home', id: 'home' },
-  { label: 'Fitur', href: '#features', id: 'features' },
-  { label: 'Harga', href: '#pricing', id: 'pricing' },
-  { label: 'Testimoni', href: '#testimonials', id: 'testimonials' },
-  { label: 'FAQ', href: '#faq', id: 'faq' },
-]
-
-const trustBadges: IconText[] = [
-  {
-    icon: Clock3,
-    title: 'Uptime 99.9%',
-    description: 'Jaminan ketersediaan',
-  },
-  {
-    icon: LockKeyhole,
-    title: 'SSL Gratis',
-    description: 'Keamanan data terjamin',
-  },
-  {
-    icon: Headphones,
-    title: 'Support 24/7',
-    description: 'Siap membantu kapan saja',
-  },
-]
-
-const heroStats: IconText[] = [
-  {
-    icon: UsersRound,
-    title: '15K+',
-    description: 'Pelanggan Aktif',
-  },
-  {
-    icon: Globe2,
-    title: '30+',
-    description: 'Lokasi Server',
-  },
-  {
-    icon: Rocket,
-    title: '1.2s',
-    description: 'Rata-rata Load Time',
-  },
-  {
-    icon: ShieldCheck,
-    title: '99.9%',
-    description: 'Uptime Terjamin',
-  },
-]
-
-type FeatureMetric = {
-  label: string
-  value: string
-}
-
-const heroFeature = {
-  icon: CircleGauge,
-  eyebrow: 'Stack Performa',
-  title: 'NVMe SSD + LiteSpeed Web Server',
-  description:
-    'Storage NVMe membaca data hingga 6x lebih cepat dari SSD biasa. LiteSpeed melayani request PHP & static asset jauh lebih efisien dari Apache. Hasil: Time to First Byte rendah, halaman terbuka di bawah 1.5 detik.',
-  metrics: [
-    { label: 'Average TTFB', value: '180ms' },
-    { label: 'Page load', value: '1.2s' },
-    { label: 'Concurrent req', value: '10K+' },
-  ] as FeatureMetric[],
-}
-
-const features: IconText[] = [
-  {
-    icon: ShieldCheck,
-    title: 'Keamanan Berlapis',
-    description: 'SSL gratis, firewall, backup harian, dan proteksi DDoS aktif sejak awal.',
-  },
-  {
-    icon: Cloud,
-    title: 'Cloud Stabil',
-    description: 'Infrastruktur cloud modern dengan monitoring real-time untuk kestabilan layanan.',
-  },
-  {
-    icon: Headphones,
-    title: 'Bantuan Responsif',
-    description: 'Tim support siap membantu migrasi, setup domain, dan optimasi website Anda.',
-  },
-]
-
-const pricingPlans: PricingPlan[] = [
-  {
-    name: 'Starter',
-    description: 'Cocok untuk website pribadi dan project baru.',
-    monthlyPrice: 19000,
-    features: ['1 Website', '10 GB NVMe SSD', 'SSL Gratis', 'Backup Harian', 'Support Standar'],
-  },
-  {
-    name: 'Business',
-    description: 'Paling pas untuk bisnis yang sedang berkembang.',
-    monthlyPrice: 49000,
-    featured: true,
-    features: [
-      'Unlimited Website',
-      '30 GB NVMe SSD',
-      'Gratis SSL & Domain',
-      'LiteSpeed Web Server',
-      'Priority Support',
-    ],
-  },
-  {
-    name: 'Pro',
-    description: 'Performa maksimal untuk traffic tinggi.',
-    monthlyPrice: 99000,
-    features: ['Unlimited Website', '80 GB NVMe SSD', 'Gratis SSL & Domain', 'Backup Harian', 'Priority Support'],
-  },
-]
-
-const formatRupiah = (value: number) => new Intl.NumberFormat('id-ID').format(value)
-
-const infrastructureBenefits: IconText[] = [
-  {
-    icon: Server,
-    title: 'Server NVMe SSD',
-    description: 'Waktu baca/tulis lebih cepat untuk website, toko online, dan aplikasi bisnis.',
-  },
-  {
-    icon: Globe2,
-    title: 'Jaringan Global',
-    description: 'Koneksi stabil dari beberapa lokasi server strategis untuk pengunjung Indonesia.',
-  },
-  {
-    icon: LockKeyhole,
-    title: 'Proteksi Aktif',
-    description: 'Monitoring, SSL, firewall, dan perlindungan DDoS bekerja sepanjang waktu.',
-  },
-]
-
-const testimonials: Testimonial[] = [
-  {
-    quote: 'Server cepat, support responsif, dan uptime benar-benar terjaga. CloudFlared hosting terbaik yang pernah saya pakai.',
-    name: 'Ardiansyah',
-    role: 'Developer',
-    initials: 'AR',
-  },
-  {
-    quote: 'Migrasi ke CloudFlared sangat mudah. Website saya jadi lebih cepat dan aman.',
-    name: 'Siti Nurhaliza',
-    role: 'Pemilik Toko Online',
-    initials: 'SN',
-  },
-  {
-    quote: 'Harga terjangkau dengan fitur lengkap. Support 24/7-nya benar-benar membantu saat dibutuhkan.',
-    name: 'Rizky Pratama',
-    role: 'Blogger',
-    initials: 'RP',
-  },
-]
-
-const footerColumns: FooterColumn[] = [
-  {
-    title: 'Layanan',
-    links: ['Hosting', 'Domain', 'SSL Certificate', 'Website Builder'],
-  },
-  {
-    title: 'Perusahaan',
-    links: ['About Us', 'Blog', 'Karir', 'Kontak'],
-  },
-  {
-    title: 'Bantuan',
-    links: ['FAQ', 'Tutorial', 'Knowledge Base', 'Status Server'],
-  },
-]
-
-type FaqItem = { question: string; answer: string }
-
-const faqItems: FaqItem[] = [
-  {
-    question: 'Berapa lama proses migrasi dari hosting lama?',
-    answer:
-      'Tim kami memindahkan website Anda gratis dalam 24 jam, termasuk database, email, dan konfigurasi DNS. Tidak ada downtime selama proses migrasi karena kami sinkronkan dulu sebelum cutover.',
-  },
-  {
-    question: 'Apakah ada garansi uang kembali?',
-    answer:
-      '30 hari tanpa pertanyaan. Jika layanan tidak sesuai harapan, kami refund 100% lewat transfer bank atau e-wallet dalam 3 hari kerja.',
-  },
-  {
-    question: 'Domain gratis berlaku untuk berapa lama?',
-    answer:
-      'Domain .com, .net, atau .id gratis 1 tahun untuk paket Business dan Pro tahunan. Untuk perpanjangan tahun ke-2, Anda hanya bayar harga registrasi normal.',
-  },
-  {
-    question: 'Server CloudFlared di mana saja?',
-    answer:
-      'Data center utama di Jakarta dan Surabaya untuk traffic Indonesia, plus node di Singapore, Tokyo, dan Frankfurt untuk traffic global. Kami pilih lokasi terdekat secara otomatis berdasarkan visitor.',
-  },
-  {
-    question: 'Tim support pakai bahasa apa?',
-    answer:
-      'Bahasa Indonesia 24/7 lewat live chat, tiket, atau WhatsApp. Tim teknis kami semua di Indonesia, jadi tidak ada zona waktu yang menyulitkan.',
-  },
-  {
-    question: 'Bisa upgrade paket kapan saja?',
-    answer:
-      'Bisa, sewaktu-waktu lewat panel. Selisih harga dihitung pro-rata dari sisa masa aktif paket lama. Tidak ada biaya tambahan dan tidak perlu migrasi ulang.',
-  },
-]
+import cloudflaredLogo from '@/assets/cloudflared-logo.png'
+import infrastructureCloudGlobe from '@/assets/infrastructure-cloud-globe.png'
+import heroCloudServer from '@/assets/hero-cloud-server.png'
+import { navLinks } from '@/data/nav'
+import { trustBadges, heroStats, heroFeature, features } from '@/data/features'
+import { pricingPlans, cycleOptions, computeYearlyMonthly } from '@/data/pricing'
+import { infrastructureBenefits } from '@/data/infrastructure'
+import { testimonials } from '@/data/testimonials'
+import { faqItems } from '@/data/faq'
+import { footerColumns } from '@/data/footer'
+import type { BillingCycle } from '@/data/types'
+import { formatRupiah } from '@/lib/format'
+import { softEase, floatEase, createFadeUp, createHeroFade, createFloatingMotion } from '@/lib/motion'
+import type { LucideIcon } from 'lucide-react'
 
 const containerClass = 'mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10'
-const softEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
-const floatEase: [number, number, number, number] = [0.45, 0, 0.55, 1]
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('home')
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly')
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly')
   const [announcementOpen, setAnnouncementOpen] = useState(true)
   const [scrolled, setScrolled] = useState(false)
   const shouldReduceMotion = useReducedMotion()
@@ -318,25 +83,9 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const fadeUp = (delay = 0) => ({
-    initial: { opacity: 0, y: shouldReduceMotion ? 0 : 24 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, amount: 0.24 },
-    transition: { duration: shouldReduceMotion ? 0 : 0.58, delay, ease: softEase },
-  })
-
-  const heroFade = (delay = 0) => ({
-    initial: { opacity: 0, y: shouldReduceMotion ? 0 : 22 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: shouldReduceMotion ? 0 : 0.68, delay, ease: softEase },
-  })
-
-  const floatingMotion = shouldReduceMotion
-    ? {}
-    : {
-        animate: { y: [0, -14, 0] },
-        transition: { duration: 7, repeat: Infinity, ease: floatEase },
-      }
+  const fadeUp = createFadeUp(!!shouldReduceMotion)
+  const heroFade = createHeroFade(!!shouldReduceMotion)
+  const floatingMotion = createFloatingMotion(!!shouldReduceMotion)
 
   return (
     <div className="min-h-screen bg-white text-cloud-navy">
@@ -846,13 +595,9 @@ function PricingSection({
   setBillingCycle,
 }: {
   fadeUp: (delay?: number) => object
-  billingCycle: 'monthly' | 'yearly'
-  setBillingCycle: (cycle: 'monthly' | 'yearly') => void
+  billingCycle: BillingCycle
+  setBillingCycle: (cycle: BillingCycle) => void
 }) {
-  const cycleOptions: { id: 'monthly' | 'yearly'; label: string; hint?: string }[] = [
-    { id: 'monthly', label: 'Bulanan' },
-    { id: 'yearly', label: 'Tahunan', hint: 'Hemat 20%' },
-  ]
   const shouldReduceMotion = useReducedMotion()
   const flipDistance = shouldReduceMotion ? 0 : 22
 
@@ -926,7 +671,7 @@ function PricingSection({
         <div className="mt-10 grid gap-7 lg:grid-cols-3 lg:items-stretch">
           {pricingPlans.map((plan, index) => {
             const monthly = plan.monthlyPrice
-            const yearlyMonthlyEquivalent = Math.round((monthly * 0.8) / 1000) * 1000
+            const yearlyMonthlyEquivalent = computeYearlyMonthly(monthly)
             const displayPrice = billingCycle === 'yearly' ? yearlyMonthlyEquivalent : monthly
             const billedNote =
               billingCycle === 'yearly'
