@@ -68,3 +68,29 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+.section-edge-top {
+  position: relative;
+}
+
+.section-edge-top::before {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 95, 0, 0.18) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.bg-grid-soft {
+  background-image:
+    linear-gradient(rgba(255, 95, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 95, 0, 0.045) 1px, transparent 1px);
+  background-size: 92px 92px;
+}

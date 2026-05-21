@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/Footer'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { PricingSection } from '@/components/sections/PricingSection'
 import { FeatureSection } from '@/components/sections/FeatureSection'
+import { ComparisonSection } from '@/components/sections/ComparisonSection'
 import { InfrastructureSection } from '@/components/sections/InfrastructureSection'
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection'
 import { FaqSection } from '@/components/sections/FaqSection'
@@ -42,6 +43,7 @@ function App() {
         <HeroSection heroFade={heroFade} />
         <PricingSection fadeUp={fadeUp} />
         <FeatureSection fadeUp={fadeUp} />
+        <ComparisonSection fadeUp={fadeUp} />
         <InfrastructureSection fadeUp={fadeUp} floatingMotion={floatingMotion} />
         <TestimonialsSection fadeUp={fadeUp} />
         <FaqSection fadeUp={fadeUp} />

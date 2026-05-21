@@ -4,6 +4,8 @@ import heroCloudServer from '@/assets/hero-cloud-server.png'
 import { trustBadges } from '@/data/features'
 import { containerClass } from '@/components/ui/container.styles'
 import { IconBadge } from '@/components/ui/IconBadge'
+import { LogoCloud } from '@/components/ui/LogoCloud'
+import { RatingPill } from '@/components/ui/RatingPill'
 import type { HeroFadeFn } from '@/lib/motion'
 import { DomainFinder } from './DomainFinder'
 import { HeroFloatingChips } from './HeroFloatingChips'
@@ -31,9 +33,12 @@ export function HeroSection({ heroFade }: HeroSectionProps) {
       <div className={`${containerClass} relative z-10`}>
         <div className="grid items-center gap-10 lg:grid-cols-[0.96fr_1.04fr] lg:gap-6">
           <motion.div {...heroFade(0.04)} className="max-w-[710px] pt-4 lg:pt-0">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/85 px-4 py-2 text-sm font-extrabold text-cloud-orange shadow-[0_14px_34px_rgba(255,106,0,0.08)] backdrop-blur">
-              <Zap size={15} fill="currentColor" strokeWidth={2.6} />
-              Hosting Cepat. Aman. Terpercaya.
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/85 px-4 py-2 text-sm font-extrabold text-cloud-orange shadow-[0_14px_34px_rgba(255,106,0,0.16)] backdrop-blur">
+                <Zap size={15} fill="currentColor" strokeWidth={2.6} />
+                Hosting Cepat. Aman. Terpercaya.
+              </div>
+              <RatingPill score="4.9" reviews="2.300+ review" />
             </div>
 
             <h1 className="max-w-[710px] text-[42px] font-black leading-[1.06] tracking-hero text-cloud-navy sm:text-[58px] lg:text-[64px] xl:text-[70px]">
@@ -61,7 +66,7 @@ export function HeroSection({ heroFade }: HeroSectionProps) {
               </a>
               <a
                 href="#pricing"
-                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-lg border border-cloud-line bg-white px-7 text-[15px] font-extrabold text-cloud-navy shadow-[0_16px_36px_rgba(16,24,40,0.05)] transition hover:-translate-y-0.5 hover:border-cloud-orange/45 hover:text-cloud-orange"
+                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-lg border border-cloud-line bg-white px-7 text-[15px] font-extrabold text-cloud-navy shadow-[0_16px_36px_rgba(16,24,40,0.08)] transition hover:-translate-y-0.5 hover:border-cloud-orange hover:text-cloud-orange"
               >
                 Lihat Paket
                 <Package size={18} />
@@ -81,12 +86,18 @@ export function HeroSection({ heroFade }: HeroSectionProps) {
                 </div>
               ))}
             </div>
+
+            <LogoCloud className="mt-10 max-w-[640px]" />
           </motion.div>
 
           <motion.div
             {...heroFade(0.18)}
             className="hero-art relative mx-auto w-full max-w-[640px] lg:max-w-none"
           >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_55%_at_55%_50%,rgba(255,95,0,0.18),transparent_70%)] blur-2xl"
+            />
             <img
               src={heroCloudServer}
               alt="Ilustrasi server cloud aman CloudFlared"

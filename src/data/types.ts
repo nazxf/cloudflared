@@ -48,9 +48,12 @@ export type Testimonial = {
   initials: string
 }
 
+export type FaqCategory = 'umum' | 'pembayaran' | 'teknis'
+
 export type FaqItem = {
   question: string
   answer: string
+  category: FaqCategory
 }
 
 export type FooterColumn = {
