@@ -21,10 +21,18 @@ export function DomainFinder() {
       role="search"
       aria-label="Cari domain"
     >
-      <div className="flex items-stretch overflow-hidden rounded-lg border border-cloud-line bg-white shadow-[0_18px_44px_rgba(16,24,40,0.08)] focus-within:border-cloud-orange/60 focus-within:ring-2 focus-within:ring-cloud-orange/15">
+      <label
+        htmlFor="hero-domain-input"
+        className="mb-2 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-500"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-cloud-orange" aria-hidden="true" />
+        Cek nama domain favoritmu
+      </label>
+      <div className="flex items-stretch overflow-hidden rounded-lg border border-cloud-line bg-white shadow-[0_18px_44px_rgba(16,24,40,0.08)] focus-within:border-cloud-orange/60 focus-within:ring-4 focus-within:ring-cloud-orange/15">
         <div className="flex flex-1 items-center gap-2 px-4">
           <Search size={17} className="flex-none text-slate-400" />
           <input
+            id="hero-domain-input"
             type="text"
             value={domain}
             onChange={(e) =>

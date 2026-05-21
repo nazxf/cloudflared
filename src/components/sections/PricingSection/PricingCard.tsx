@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Check, Star } from 'lucide-react'
+import { ArrowRight, Check, Sparkles } from 'lucide-react'
 import { computeYearlyMonthly } from '@/data/pricing'
 import type { BillingCycle, PricingPlan } from '@/data/types'
 import { formatRupiah } from '@/lib/format'
@@ -18,74 +18,101 @@ type PricingCardProps = {
  */
 export function PricingCard({ plan, billingCycle, index, fadeUp }: PricingCardProps) {
   const shouldReduceMotion = useReducedMotion()
-  const flipDistance = shouldReduceMotion ? 0 : 22
+  const flipDistance = shouldReduceMotion ? 0 : 20
 
   const monthly = plan.monthlyPrice
   const yearlyMonthlyEquivalent = computeYearlyMonthly(monthly)
   const displayPrice = billingCycle === 'yearly' ? yearlyMonthlyEquivalent : monthly
   const billedNote =
     billingCycle === 'yearly'
-      ? `Ditagih Rp ${formatRupiah(displayPrice * 12)}/tahun`
-      : 'Ditagih bulanan'
+      ? `Ditagih Rp ${formatRupiah(displayPrice * 12)} per tahun`
+      : 'Ditagih bulanan, batal kapan saja'
+  const showSavingsTag = billingCycle === 'yearly'
+  const monthlySavings = monthly - yearlyMonthlyEquivalent
 
   return (
     <motion.article
       {...fadeUp(index * 0.08)}
-      className={`group relative flex flex-col overflow-hidden rounded-lg border bg-white p-7 shadow-cloud-card transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(15,24,48,0.12)] ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white p-7 shadow-cloud-card transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_rgba(15,24,48,0.14)] ${
         plan.featured
-          ? 'border-cloud-orange ring-1 ring-cloud-orange/25 lg:-my-2 lg:py-9'
-          : 'border-cloud-line'
+          ? 'border-cloud-orange/70 ring-1 ring-cloud-orange/20 lg:-my-3 lg:py-9'
+          : 'border-cloud-line hover:border-cloud-orange/40'
       }`}
     >
       {plan.featured && (
-        <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-1.5 bg-cloud-orange py-2 text-[11px] font-black uppercase tracking-[0.12em] text-white">
-          <Star size={11} fill="currentColor" strokeWidth={0} />
-          Paling Populer
-        </div>
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-px rounded-2xl bg-[radial-gradient(120%_60%_at_50%_0%,rgba(255,95,0,0.12),transparent_55%)]"
+          />
+          <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-1.5 bg-gradient-to-r from-cloud-orange to-cloud-orange-2 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-white">
+            <Sparkles size={12} strokeWidth={2.5} />
+            Paling Populer
+          </div>
+        </>
       )}
-      <div className={plan.featured ? 'pt-8' : ''}>
+
+      <div className={`relative ${plan.featured ? 'pt-9' : ''}`}>
         <h3 className="text-2xl font-black text-cloud-navy">{plan.name}</h3>
         <p className="mt-3 min-h-12 text-sm font-medium leading-6 text-slate-500">
           {plan.description}
         </p>
-        <div className="mt-7 flex items-end gap-1">
-          <span className="text-xs font-extrabold text-cloud-navy">Rp</span>
-          <div className="relative h-9 overflow-hidden">
-            <AnimatePresence initial={false}>
+
+        <div className="mt-7 flex items-baseline gap-1.5">
+          <span className="text-base font-extrabold text-cloud-navy/70">Rp</span>
+          <div className="relative inline-grid">
+            <AnimatePresence initial={false} mode="popLayout">
               <motion.span
                 key={billingCycle}
                 initial={{ y: flipDistance, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -flipDistance, opacity: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.32, ease: softEase }}
-                className="absolute inset-0 block whitespace-nowrap text-3xl font-black leading-none text-cloud-orange tabular-nums"
+                className="col-start-1 row-start-1 whitespace-nowrap text-[40px] font-black leading-none tracking-tight text-cloud-navy tabular-nums"
               >
                 {formatRupiah(displayPrice)}
               </motion.span>
             </AnimatePresence>
           </div>
-          <span className="pb-1 text-sm font-bold text-slate-500">/bulan</span>
+          <span className="text-sm font-bold text-slate-400">/bulan</span>
         </div>
-        <div className="mt-2 h-4 overflow-hidden">
+
+        <div className="mt-2 flex min-h-5 items-center gap-2">
           <AnimatePresence initial={false} mode="wait">
             <motion.p
               key={billedNote}
-              initial={{ y: shouldReduceMotion ? 0 : 8, opacity: 0 }}
+              initial={{ y: shouldReduceMotion ? 0 : 6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: shouldReduceMotion ? 0 : -8, opacity: 0 }}
+              exit={{ y: shouldReduceMotion ? 0 : -6, opacity: 0 }}
               transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: softEase }}
               className="text-xs font-semibold text-slate-500"
             >
               {billedNote}
             </motion.p>
           </AnimatePresence>
+          {showSavingsTag && monthlySavings > 0 && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: softEase, delay: 0.05 }}
+              className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-cloud-orange"
+            >
+              Hemat Rp {formatRupiah(monthlySavings)}
+            </motion.span>
+          )}
         </div>
       </div>
 
-      <ul className="mt-7 space-y-4">
+      <div className="my-7 h-px w-full bg-gradient-to-r from-transparent via-cloud-line to-transparent" />
+
+      <ul className="space-y-3.5">
         {plan.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-3 text-sm font-bold text-cloud-navy">
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-50 text-cloud-orange">
+          <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-cloud-navy">
+            <span
+              className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                plan.featured ? 'bg-cloud-orange text-white' : 'bg-orange-50 text-cloud-orange'
+              }`}
+            >
               <Check size={13} strokeWidth={3} />
             </span>
             {feature}
@@ -95,7 +122,7 @@ export function PricingCard({ plan, billingCycle, index, fadeUp }: PricingCardPr
 
       <a
         href="#home"
-        className={`mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border text-sm font-black transition ${
+        className={`mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border text-sm font-black transition ${
           plan.featured
             ? 'border-cloud-orange bg-cloud-orange text-white shadow-cloud-orange hover:bg-cloud-orange-2'
             : 'border-cloud-line bg-white text-cloud-navy hover:border-cloud-orange hover:text-cloud-orange'

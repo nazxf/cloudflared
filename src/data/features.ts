@@ -7,9 +7,18 @@ import {
   LockKeyhole,
   Rocket,
   ShieldCheck,
+  ShieldHalf,
   UsersRound,
+  Wifi,
+  Database,
 } from 'lucide-react'
 import type { HeroFeature, IconText } from './types'
+
+export type HeroStat = IconText & {
+  value: number
+  decimals?: number
+  suffix?: string
+}
 
 export const trustBadges: IconText[] = [
   {
@@ -29,24 +38,34 @@ export const trustBadges: IconText[] = [
   },
 ]
 
-export const heroStats: IconText[] = [
+export const heroStats: HeroStat[] = [
   {
     icon: UsersRound,
+    value: 15,
+    suffix: 'K+',
     title: '15K+',
     description: 'Pelanggan Aktif',
   },
   {
     icon: Globe2,
+    value: 30,
+    suffix: '+',
     title: '30+',
     description: 'Lokasi Server',
   },
   {
     icon: Rocket,
+    value: 1.2,
+    decimals: 1,
+    suffix: 's',
     title: '1.2s',
     description: 'Rata-rata Load Time',
   },
   {
     icon: ShieldCheck,
+    value: 99.9,
+    decimals: 1,
+    suffix: '%',
     title: '99.9%',
     description: 'Uptime Terjamin',
   },
@@ -81,4 +100,17 @@ export const features: IconText[] = [
     title: 'Bantuan Responsif',
     description: 'Tim support siap membantu migrasi, setup domain, dan optimasi website Anda.',
   },
+]
+
+export type SecurityStackItem = {
+  icon: typeof ShieldHalf
+  label: string
+  detail: string
+}
+
+export const securityStack: SecurityStackItem[] = [
+  { icon: LockKeyhole, label: 'SSL Gratis', detail: 'Wildcard ready' },
+  { icon: ShieldHalf, label: 'WAF', detail: 'Filter request berbahaya' },
+  { icon: Wifi, label: 'Anti DDoS', detail: 'Mitigasi otomatis' },
+  { icon: Database, label: 'Backup', detail: 'Harian + retensi 14 hari' },
 ]
